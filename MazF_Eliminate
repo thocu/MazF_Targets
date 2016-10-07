@@ -1,0 +1,72 @@
+import os
+import math
+import csv
+import Bio
+import test
+print(os.getcwd())
+
+
+def stirling(n):
+    t1 = 2*math.pi*n
+    print(t1)
+    t2 = (n/math.e)**n
+    print(t2)
+    return math.sqrt(2*math.pi*n)*(n/math.e)**n
+
+fasta = open("EDGe_CDS.fa.txt", "r") 
+
+isgene = 0
+gene = ''
+genename = ''
+TotalName = ''
+TotalPsum = ''
+results= []
+
+
+
+for index,line in enumerate(fasta):    #interates the command line over and over
+    if index < 1:
+        continue 
+    line = line.strip()
+    if line[0] == '>':
+        print(len(gene))
+        nuc = {'A': 0, 'T' : 0, 'G': 0, 'C' : 0}
+        nuc.get('>', None)
+        for letter in gene:
+            nuc[letter] += 1 
+        motifcount = gene.count('ATGCA') + gene.count('ATGTA')
+        print(motifcount)
+        l = len(gene)
+        p = ((nuc['T']/l)**2)*((nuc['A']/l)**2)*(nuc['C']/l) + ((nuc['T']/l)**2)*(nuc['A']/l)*((nuc['C']/l)**2)
+        Psum =0
+        for i in range(1, motifcount):
+            temp = p**i*((1 - p)**(l -4 -i))
+            Psum += temp*math.exp(math.log(math.factorial(l-4)) - math.log(math.factorial(i) * math.factorial(l-4-i)))
+        print(genename)
+        print('P eliminate motif',Psum)
+        temp_p1 = Psum
+        gene = ''
+
+        genename = line
+        results.append((genename, l, motifcount, Psum))
+
+        Psum = 0
+        nuc = 0
+        motifcount =0
+        temp = 0
+        temp_p1 = 0
+
+           
+        isgene = 1
+        
+
+        f = open('MazF_DNAseq_Eliminate.txt', 'w')
+        for t in results:
+            line = ', '.join(str(x) for x in t)
+            f.write(line + '\n')
+        
+    else:
+        gene += line
+        isgene = 0
+
+f.close()
